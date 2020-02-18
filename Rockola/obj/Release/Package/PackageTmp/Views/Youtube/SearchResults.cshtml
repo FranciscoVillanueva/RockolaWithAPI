@@ -1,0 +1,124 @@
+﻿@model List<Google.Apis.YouTube.v3.Data.SearchResult>
+
+@for (int i = 0; i < Model.Count; i++)
+{
+    @Model[i].Snippet.Title <br />
+    <img onclick="btnPlay('@Model[i].Id.VideoId')" class="img-responsive" src="http://img.youtube.com/vi/@Model[i].Id.VideoId/mqdefault.jpg" alt="@Model[i].Snippet.Title">
+    <button class="btn btn-default btn-sm" onclick="player.destroy(); onYouTubeIframeAPIReady('@Model[i].Id.VideoId')"> Play </button>
+    <button class="btn btn-default btn-sm" onclick="addToPlayList('@Model[i].Id.VideoId','@Model[i].Snippet.Thumbnails.Default__.Url')">Add to playlist</button>
+    <br /> <br />
+}
+
+<script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+    var playListContainer;
+    var band = false;
+    function onYouTubeIframeAPIReady(VideoId) {
+        if (VideoId == null) {
+            VideoId = '1zKo_I8VhkA';
+        }
+        player = new YT.Player('player', {
+            height: '390',
+            width: '100%',
+            videoId: VideoId,
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+        event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            band = true;
+        } else if (event.data == YT.PlayerState.PAUSED) {
+            band = false;
+        }
+        console.log(event.data);
+        if (event.data == YT.PlayerState.ENDED && !done) {
+            //reproducir 1er video de la cola
+            playListContainer = document.getElementById('playList');
+            //var nextVideoToPlay = playListContainer.children[0];
+            videoStopped = true;
+            playQueue();
+        }
+    }
+    function stopVideo() {
+        player.stopVideo();
+    }
+
+    function addToPlayList(videoId, videoImageURL) {
+        if (band) {
+            playListContainer = document.getElementById('playList');
+            var cel = document.createElement('td');
+            cel.className = "myCell";
+            playListContainer.append(cel);
+            var img = document.createElement('img');
+            img.src = videoImageURL;
+            img.alt = videoId;
+            img.width = 140;
+            cel.append(img);
+        } else {
+            player.destroy();
+            onYouTubeIframeAPIReady(videoId);
+        }
+        HideShowPlayList(); 
+    }
+
+    function HideShowPlayList() {
+        playListContainer = document.getElementById('playList');
+        if (playListContainer.children.length == 0) {
+            $('#BlockPlaylist').hide();
+            console.log('cero');
+        }
+        else {
+            console.log('no es cero')
+            $('#BlockPlaylist').show();
+        }
+    }
+
+    function playQueue() {
+        var firstVideo = playListContainer.children[0].children[0];
+        var firstCell = playListContainer.children[0];
+        var videoId = firstVideo.alt;
+        firstCell.remove();
+        player.destroy();
+        HideShowPlayList();
+        onYouTubeIframeAPIReady(videoId);
+    }
+
+</script>
+
+<style>
+    .myCell {
+        height: 104px;
+        width: 140px;
+        border-right: double;
+        border-width: 4px;
+    }
+
+    /*.myImage {
+        max-width: 100%;
+        max-height: 100%;
+        margin: auto;
+        display: block;
+    }*/
+</style>

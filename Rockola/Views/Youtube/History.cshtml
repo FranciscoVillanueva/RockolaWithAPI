@@ -1,0 +1,15 @@
+﻿@model List<Google.Apis.YouTube.v3.Data.SearchResult>
+
+<h2>History</h2>
+
+<ol>
+    @foreach (var item in Model)
+    {
+        <li>@item.Snippet.Title</li>
+    }
+</ol>
+
+
+
+
+

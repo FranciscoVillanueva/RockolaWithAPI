@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<br /> <br />
+
+@{
+    ViewBag.Title = "Rockola";
+}
+
+<style>
+    #ListFoundYoutubeVideos {
+        grid-area: ListYoutube;
+        height: 300px;
+        width: 100%;
+        overflow-y: scroll;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="text" style="background-color: #737373; color:white" class="form-control" id="Search" />
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit" href="javascript:void(0)" onclick="btnSearch()"> <i class="glyphicon glyphicon-search"></i></button>
+                </div>
+            </div>
+            <br />
+            <div style="display:none" class="container" id="ListFoundYoutubeVideos"></div>
+        </div>
+        <div class="col-md-8">
+            <div id="player"></div>
+        </div>
+    </div>
+    <div style="display:none" class="row" id="BlockPlaylist">
+        <h2>Playlist</h2>
+        <div style="width:100%;position:center;overflow-x:scroll">
+            <table>
+                <tr id="playList"></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+@*https://developers.google.com/youtube/iframe_api_reference*@
+
+<script>
+
+    function btnSearch() {
+        $('#ListFoundYoutubeVideos').show();
+        $.ajax(
+            {
+                url: '@Url.Action("SearchList","Youtube")?SearchWord=' + $('#Search').val(),
+                type: 'GET',
+                success: function (result) {
+                    $('#ListFoundYoutubeVideos').html(result);
+                }
+            });
+    }
+
+    @*function btnPlay(Id) {
+        $.ajax(
+            {
+                url: '@Url.Action("Play","Youtube")?IdVideo=' + Id,
+                type: 'GET',
+                success: function (result) {
+                    $('#play').html(result);
+                }
+            });
+    }*@
+</script>
+
+
